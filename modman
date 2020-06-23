@@ -1,0 +1,15 @@
+app/code/community/Klarna/LICENSE.txt
+app/code/community/Klarna/NOTICE.txt
+app/code/community/Klarna/Payments
+app/design/frontend/base/default/layout/klarna_payments.xml
+app/design/frontend/base/default/template/klarnapayments
+app/design/adminhtml/default/default/template/klarnapayments
+app/etc/modules/Klarna_Payments.xml
+skin/frontend/base/default/klarnapayment/js/address-validation.js
+app/code/community/Klarna/OrderManagement
+app/etc/modules/Klarna_OrderManagement.xml
+app/code/community/Klarna/Core
+app/etc/modules/Klarna_Core.xml
+app/locale/en_US/Klarna_Core.csv
+app/locale/en_US/Klarna_OrderManagement.csv
+app/locale/en_US/Klarna_Payments.csv

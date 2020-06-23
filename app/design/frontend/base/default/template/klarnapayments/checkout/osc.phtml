@@ -1,0 +1,76 @@
+<?php
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+
+/**
+ * @var Klarna_Payments_Block_Payments $this
+ */
+?>
+<?php if (Mage::getStoreConfigFlag('payment/' . $this->getMethodCode() . '/active')): ?>
+<script type="text/javascript">
+    <?php $paymentMethodCategories = $this->getPaymentMethodCategories(); ?>
+    <?php foreach ($paymentMethodCategories as $method): ?>
+
+        if ($('p_method_klarna_payments_<?php echo $method['identifier']  ?>').checked) {
+            Klarna<?php echo $this->getFunctionName(); ?><?php echo $method['identifier']  ?>Load();
+        }
+
+        jQuery(document).ready(function () {
+            if (jQuery("#payment_form_klarna_payments_<?php echo $method['identifier']  ?> iframe").length == 0) {
+                jQuery("#payment_form_klarna_payments_<?php echo $method['identifier']  ?>").hide();
+            }
+        });
+
+    <?php endforeach; ?>
+    jQuery(document).on("kp_form_refresh_after", function (event, data) {
+        if (payment.currentMethod == false) {
+            jQuery("#checkout-payment-method-load :input:radio").each(function (index) {
+                if (jQuery(this).is(':checked')) {
+                    jQuery(this).prop('checked', false);
+                }
+            });
+        }
+    });
+
+    Validation.prototype.validate = Validation.prototype.validate.wrap(function(originalMethod) {
+        //return originalMethod();
+        // We only want to override for place order
+        if (this.form !== $('onestepcheckout-form')) {
+            return originalMethod();
+        }
+
+        if (!klarnaPaymentArray || klarnaPaymentArray.length === 0) {
+            return originalMethod();
+        }
+
+        var found = false;
+        var proceed = false;
+
+        klarnaPaymentArray.forEach(function(currentValue) {
+            if (payment.currentMethod == currentValue.name) {
+                found = true;
+                if ($('payment_' + payment.currentMethod + '_authorization_token').value) {
+                    // avoid loops
+                    proceed = true;
+                }
+                if (!proceed) {
+                    // This actually calls the Klarna authorize() method:
+                    return currentValue.action(function () {
+                        return true;
+                    });
+                }
+            }
+        });
+
+        if (!found || proceed) {
+            return originalMethod();
+        }
+    });
+</script>
+<?php endif; ?>

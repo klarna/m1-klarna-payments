@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+-->
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>klarnapayment/js/address-validation.js</name></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="klarna.js" as="klarna-js" template="klarnapayments/api.phtml" after="-"/>
+            <block type="klarna_payments/payments" name="klarna.payments.api" template="klarnapayments/js.phtml" after="klarna-js">
+                <block type="klarna_payments/payments" name="klarna.native" template="klarnapayments/checkout/native.phtml" after="-"/>
+            </block>
+        </reference>
+    </checkout_onepage_index>
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <block type="klarna_payments/payments" name="klarna.osc.header" template="klarnapayments/checkout/header-osc.phtml" before="-"/>
+            <action method="addItem"><type>skin_js</type><name>klarnapayment/js/address-validation.js</name></action>
+        </reference>
+        <reference name="content">
+            <block type="core/template" name="klarna.js" as="klarna-js" template="klarnapayments/api.phtml" before="onestepcheckout.checkout"/>
+            <block type="klarna_payments/payments" name="klarna.payments.api" template="klarnapayments/js.phtml" after="klarna-js">
+                <block type="klarna_payments/payments" name="klarna.osc" template="klarnapayments/checkout/osc.phtml" after="-"/>
+            </block>
+        </reference>
+    </onestepcheckout_index_index>
+</layout>

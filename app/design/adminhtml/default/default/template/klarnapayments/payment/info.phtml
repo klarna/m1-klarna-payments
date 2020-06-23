@@ -1,0 +1,37 @@
+<?php
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+
+/**
+ * Klarna payment type template
+ */
+
+/** @var $this Klarna_Payments_Block_Info_Payments */
+?>
+<p><img width="150" src="https://cdn.klarna.com/1.0/shared/image/generic/logo/<?php echo Mage::helper('klarna_payments')->getLocale($this->getInfo()->getOrder()->getStore()); ?>/basic/logo_black.png?width=300"
+        alt="<?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?>"/></p>
+
+<?php if ($_specificInfo = $this->getSpecificInformation()): ?>
+    <table>
+        <?php foreach ($_specificInfo as $_label => $_value): ?>
+            <tr>
+                <td><?php echo $this->escapeHtml($_label) ?>:</td>
+                <td>
+                    <?php if ($this->isStringUrl($_value)): ?>
+                        <a href="<?= $_value; ?>" target="_blank"><?= $this->__('Click Here') ?></a>
+                    <?php else: ?>
+                        <?php echo nl2br(implode($this->getValueAsArray($_value, true), "\n")) ?>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+
+<?php echo $this->getChildHtml() ?>

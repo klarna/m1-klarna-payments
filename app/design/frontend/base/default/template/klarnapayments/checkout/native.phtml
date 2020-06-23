@@ -1,0 +1,70 @@
+<?php
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+
+/**
+ * @var Klarna_Payments_Block_Payments $this
+ */
+?>
+<?php if (Mage::getStoreConfigFlag('payment/' . $this->getMethodCode() . '/active')): ?>
+<script type="text/javascript">
+    Payment.prototype.save = Payment.prototype.save.wrap(function(save) {
+        if (!klarnaPaymentArray || klarnaPaymentArray.length === 0) {
+            return save();
+        }
+
+        var validator = new Validation(this.form);
+        if (!(this.validate() && validator.validate())) {
+            return save();
+        }
+        var found = false;
+        klarnaPaymentArray.forEach(function(currentValue) {
+            if (payment.currentMethod === currentValue.name) {
+                found = true;
+                return currentValue.action(save);
+            }
+        });
+        if (!found) {
+            return save();
+        }
+    });
+
+    Review.prototype.save = Review.prototype.save.wrap(function (save) {
+        var klarna_payment_finalize_order_update_data = [];
+        var klarna_payment_finalize_required = false;
+        var payment_category_identifier = '';
+
+        klarnaPaymentArray.forEach(function (currentValue) {
+            if (payment.currentMethod === currentValue.name) {
+                klarna_payment_finalize_order_update_data = JSON.parse(
+                    currentValue.klarnaFinalizeCallData.klarna_payment_finalize_order_update_data
+                );
+                klarna_payment_finalize_required = $(currentValue.name + '_finalize_required').value == 0 ? false : true;
+                payment_category_identifier = currentValue.name.replace("klarna_payments_", "");
+            }
+        });
+
+        if (!klarna_payment_finalize_required) {
+            return save();
+        }
+        var klarna_payment_finalize = {payment_method_category: payment_category_identifier};
+        Klarna.<?php echo $this->getFunctionName(); ?>.finalize(
+            klarna_payment_finalize,
+            klarna_payment_finalize_order_update_data,
+            function (finalize_response) {
+            if (finalize_response.approved) {
+                $('payment_klarna_payments_' + payment_category_identifier + '_authorization_token').value = finalize_response.authorization_token;
+                Event.fire(document, 'klarna:finalize:success', finalize_response);
+                return save();
+            }
+            Event.fire(document, 'klarna:finalize:fail', finalize_response);
+        });
+    });
+</script>
+<?php endif; ?>

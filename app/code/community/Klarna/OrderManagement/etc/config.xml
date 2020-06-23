@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Klarna OrderManagement module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+-->
+<config>
+    <modules>
+        <Klarna_OrderManagement>
+            <version>1.2.2</version>
+        </Klarna_OrderManagement>
+    </modules>
+    <global>
+        <models>
+            <klarna_ordermanagement>
+                <class>Klarna_OrderManagement_Model</class>
+            </klarna_ordermanagement>
+        </models>
+        <helpers>
+            <klarna_ordermanagement>
+                <class>Klarna_OrderManagement_Helper</class>
+            </klarna_ordermanagement>
+        </helpers>
+        <events>
+            <klarna_core_client_user_agent_string>
+                <observers>
+                    <klarna_ordermanagement_ua>
+                        <class>klarna_ordermanagement/observer</class>
+                        <method>klarnaCoreClientUserAgentString</method>
+                    </klarna_ordermanagement_ua>
+                </observers>
+            </klarna_core_client_user_agent_string>
+        </events>
+    </global>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Klarna_OrderManagement>
+                    <files>
+                        <default>Klarna_OrderManagement.csv</default>
+                    </files>
+                </Klarna_OrderManagement>
+            </modules>
+        </translate>
+    </adminhtml>
+    <default>
+        <klarna>
+            <api>
+                <post_purchase_api>order_management</post_purchase_api>
+            </api>
+        </klarna>
+    </default>
+    <klarna>
+        <api_post_purchase_types>
+            <order_management translate="label">
+                <label>Klarna Order Management API</label>
+                <type>kasper</type>
+                <class>klarna_ordermanagement/api_kasper_postPurchase</class>
+            </order_management>
+        </api_post_purchase_types>
+    </klarna>
+</config>

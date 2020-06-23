@@ -1,0 +1,35 @@
+<?php
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+
+/**
+ * @var Klarna_Payments_Block_Payments $this
+ */
+?>
+<?php if (Mage::getStoreConfigFlag('payment/' . $this->getMethodCode() . '/active')): ?>
+    <?php $payment = Mage::getSingleton('checkout/session')->getquote()->getPayment(); ?>
+    <?php $subType = Mage::getSingleton('checkout/session')->getKlarnaPaymentsSelected(); ?>
+    <script type="text/javascript">
+        function Klarna<?php echo $this->getFunctionName(); ?>Init() {
+            fireWhenReady(function () {
+                Klarna.<?php echo $this->getFunctionName(); ?>.init({
+                    client_token: "<?php echo $this->getClientToken(); ?>"
+                });
+            })
+        }
+
+        document.observe("dom:loaded", function () {
+            Klarna<?php echo $this->getFunctionName(); ?>Init();
+            <?php if ($payment->getMethod() && $payment->getMethodInstance() instanceof Klarna_Core_Model_Payment_Method_Abstract): ?>
+                jQuery('#p_method_klarna_payments_<?php echo $subType; ?>').click();
+            <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>
+<?php echo $this->getChildHtml('', false);

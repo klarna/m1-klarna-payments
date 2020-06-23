@@ -1,0 +1,135 @@
+<?php
+/**
+ * This file is part of the Klarna Core module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+
+/** @var Klarna_Payments_Block_Form_Payments $this */
+?>
+<?php
+$kpOrderUpdateData = $this->getOrderUpdateDataJson();
+$categoryInformation = $this->getMethodCategoryInformation();
+?>
+
+<div class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <div id="<?php echo $this->getContainerId() ?>-<?php echo $categoryInformation['identifier'] ?>"></div>
+    <input type="hidden" name="payment[authorization_token]"
+           id="payment_<?php echo $this->getMethodCode() ?>_authorization_token"
+           class="kp_payment_auth_token_field"
+           value="<?php echo $this->getAuthorizationToken(); ?>"/>
+    <input type="hidden" name="klarna_payments_<?php echo $categoryInformation['identifier'] ?>_finalize_required"
+           id="klarna_payments_<?php echo $categoryInformation['identifier'] ?>_finalize_required"
+           value="0"/>
+    <?php if ($this->isOneStepCheckout()): ?>
+        <input type="hidden" name="klarna_<?php echo $categoryInformation['identifier'] ?>_update_data"
+               id="klarna_<?php echo $categoryInformation['identifier'] ?>_update_data"
+               value='<?php echo rawurlencode($kpOrderUpdateData); ?>'/>
+    <?php endif; ?>
+    <?php if ($this->getClientToken()): ?>
+        <script type="text/javascript">
+            /* <![CDATA[ */
+            var klarna<?php echo $categoryInformation['identifier']; ?>UpdateData = <?php echo $kpOrderUpdateData; ?>;
+            $(document).on('kp_form_refresh_after');
+
+            function Klarna<?php echo $this->getFunctionName(); ?><?php echo $categoryInformation['identifier'] ?>Load() {
+                fireWhenReady(function () {
+                    Klarna.<?php echo $this->getFunctionName(); ?>.load({
+                            container: "#<?php echo $this->getContainerId() ?>-<?php echo $categoryInformation['identifier'] ?>",
+                            payment_method_category: "<?php echo $categoryInformation['identifier'] ?>"
+                        },
+                        function (response) {
+                            Event.fire(document, 'klarna:load', response);
+                            Event.fire(document, 'klarna:load:success', response);
+                        });
+                });
+            }
+
+            <?php if (!$this->isOneStepCheckout()): ?>
+                <?php if ($this->getPreScreenEnabled() || $this->hasAuthorizationToken()):?>
+                Klarna<?php echo $this->getFunctionName(); ?><?php echo $categoryInformation['identifier'] ?>Load();
+                <?php endif;?>
+
+                if ($('payment_form_<?php echo $categoryInformation['identifier'] ?>')) {
+                    $('payment_form_<?php echo $categoryInformation['identifier'] ?>').on('payment-method:switched', Klarna<?php echo $this->getFunctionName(); ?><?php echo $categoryInformation['identifier'] ?>Load);
+                } else {
+                    document.body.on('payment-method:switched', Klarna<?php echo $this->getFunctionName(); ?><?php echo $categoryInformation['identifier'] ?>Load);
+                }
+            <?php else: ?>
+                Event.observe('p_method_klarna_payments_<?php echo $categoryInformation['identifier'] ?>', 'click', Klarna<?php echo $this->getFunctionName(); ?><?php echo $categoryInformation['identifier'] ?>Load);
+            <?php endif; ?>
+
+            if (!klarnaPaymentArray) {
+                klarnaPaymentArray = [];
+            }
+
+            var updateDataIsValid = false;
+            if (typeof klarna<?php echo $categoryInformation['identifier']; ?>UpdateData.billing_address.postal_code !== 'undefined'
+                || typeof klarna<?php echo $categoryInformation['identifier']; ?>UpdateData.billing_address.postal_code !== 'undefined') {
+                updateDataIsValid = true;
+            }
+
+            if (updateDataIsValid) {
+                klarna<?php echo $categoryInformation['identifier']; ?>UpdateData = updateBillingAddressForKlarna(
+                    klarna<?php echo $categoryInformation['identifier']; ?>UpdateData,
+                    $('klarna_<?php echo $categoryInformation['identifier'] ?>_update_data')
+                );
+
+                klarnaPaymentArray = klarnaPaymentArray.filter(
+                    function(item) {
+                        return item['name'] !== 'klarna_payments_<?php echo $categoryInformation['identifier'] ?>';
+                    }
+                );
+
+                klarnaPaymentArray.push({
+                    name: 'klarna_payments_<?php echo $categoryInformation['identifier'] ?>',
+                    action: function Klarna<?php echo $this->getFunctionName(); ?>Authorize(save) {
+                        klarna<?php echo $categoryInformation['identifier']; ?>UpdateData = updateBillingAddressForKlarna(
+                            klarna<?php echo $categoryInformation['identifier']; ?>UpdateData,
+                            $('klarna_<?php echo $categoryInformation['identifier'] ?>_update_data')
+                        );
+                        payments_klarna = {
+                            payment_method_category: '<?php echo $categoryInformation['identifier'] ?>',
+                            'auto_finalize': <?php echo json_encode($this->isAutoFinalize()) ?>
+                        }
+                        Event.fire(document, 'klarna:load');
+                        Klarna.<?php echo $this->getFunctionName(); ?>.authorize(payments_klarna, klarna<?php echo $categoryInformation['identifier']; ?>UpdateData, function (response) {
+                            Event.fire(document, 'klarna:authorize', response);
+                            // Success
+                            if (response.approved) {
+                                if (response.finalize_required === true) {
+                                    $('klarna_payments_<?php echo $categoryInformation['identifier'] ?>_finalize_required').value = 1;
+                                } else {
+                                    $('klarna_payments_<?php echo $categoryInformation['identifier'] ?>_finalize_required').value = 0;
+                                }
+                                Event.fire(document, 'klarna:authorize:success', response);
+                                $('payment_<?php echo $this->getMethodCode() ?>_authorization_token').value = response.authorization_token;
+                                <?php if ($this->isOneStepCheckout()):?>
+                                jQuery('.kp_payment_auth_token_field').val(response.authorization_token);
+                                document.getElementById("onestepcheckout-place-order").click();
+                                <?php endif;?>
+                                return save();
+                            }
+                            // unresolvable errors (Or denied)
+                            if (!response.approved) {
+                                Event.fire(document, 'klarna:authorize:fail', response);
+                            }
+                        });
+                    },
+                    klarnaFinalizeCallData: {
+                        klarna_payment_finalize_order_update_data: JSON.stringify(klarna<?php echo $categoryInformation['identifier']; ?>UpdateData)
+                    }
+                });
+            }
+            /* ]]> */
+
+            var payment_container = $('container_payment_method_klarna_payments_<?php echo $categoryInformation['identifier'] ?>')
+            if (payment_container !== null) {
+                payment_container.hide();
+            }
+        </script>
+    <?php endif; ?>
+</div>

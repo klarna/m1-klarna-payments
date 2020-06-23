@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Klarna Payments module
+ *
+ * (c) Klarna Bank AB (publ)
+ *
+ * For the full copyright and license information, please view the NOTICE
+ * and LICENSE files that were distributed with this source code.
+ */
+-->
+<config>
+    <sections>
+        <payment>
+            <groups>
+                <klarna_payments translate="label" module="klarna_payments">
+                    <label>Klarna Payments</label>
+                    <sort_order>6</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <active translate="label comment">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>1</sort_order>
+                            <comment>
+                                <model>klarna_payments/adminhtml_comment</model>
+                            </comment>
+                        </active>
+                        <allowspecific translate="label comment">
+                            <label>Payment from applicable countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>20</sort_order>
+                            <comment>If set to specific, guest customers will not have a billing country and may not be able to checkout.</comment>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>30</sort_order>
+                        </specificcountry>
+                        <pre_screen translate="label comment">
+                            <label>Pre-screen</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>40</sort_order>
+                            <comment>Pre-screen customers.</comment>
+                        </pre_screen>
+                        <data_sharing translate="label comment">
+                            <label>Data sharing</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>50</sort_order>
+                            <comment>Allow customer data to be shared with Klarna before customer places the order.</comment>
+                        </data_sharing>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <frontend_class>validate-number</frontend_class>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>100</sort_order>
+                        </sort_order>
+                    </fields>
+                </klarna_payments>
+            </groups>
+        </payment>
+        <checkout>
+            <groups>
+                <klarna_payments_design translate="label">
+                    <label>Klarna Payments Design</label>
+                    <frontend_type>text</frontend_type>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>110</sort_order>
+                    <fields>
+                        <color_details translate="label comment">
+                            <label>Details color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>1</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_details>
+                        <color_button translate="label comment">
+                            <label>Button color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>2</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_button>
+                        <color_button_text translate="label comment">
+                            <label>Button text color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>3</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_button_text>
+                        <color_checkbox translate="label comment">
+                            <label>Checkbox color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>4</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_checkbox>
+                        <color_checkbox_checkmark translate="label comment">
+                            <label>Checkbox check mark color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>5</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_checkbox_checkmark>
+                        <color_header translate="label comment">
+                            <label>Header color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>6</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_header>
+                        <color_link translate="label comment">
+                            <label>Link color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>7</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_link>
+                        <color_border translate="label comment">
+                            <label>Border color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>8</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_border>
+                        <color_border_selected translate="label comment">
+                            <label>Selected border color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>9</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_border_selected>
+                        <color_text translate="label comment">
+                            <label>Text color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>10</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_text>
+                        <color_text_secondary translate="label comment">
+                            <label>Secondary text color</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>11</sort_order>
+                            <comment>Example: #C0FFEE</comment>
+                        </color_text_secondary>
+                        <radius_border translate="label comment">
+                            <label>Border radius</label>
+                            <frontend_type>text</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <sort_order>12</sort_order>
+                            <comment>Example: 5px</comment>
+                        </radius_border>
+                    </fields>
+                </klarna_payments_design>
+            </groups>
+        </checkout>
+    </sections>
+</config>
